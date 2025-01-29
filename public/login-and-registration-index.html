@@ -15,21 +15,33 @@
 <body>
   <div class="container">
     <input type="checkbox" id="check">
-    <div class="login form">
+    <div id="loginForm" class="login form">
       <header>Авторизация</header>
       <form action="#" name="authorize">
         <input required type="email" name="email" placeholder="Введите свою электронную почту">
         <input required type="password" name="password" placeholder="Введите свой пароль">
-        <a href="#">Забыли пароль?</a>
+        <a href="#" id="forgotPasswordLink">Забыли пароль?</a>
         <input type="submit" class="button" value="Авторизоваться">
       </form>
       <div class="signup">
         <span class="signup">Хотите зарегистрироваться?
-          <label for="check">Регистрация</label>
+          <label for="check" id="registerLink">Регистрация</label>
         </span>
       </div>
     </div>
-    <div class="registration form">
+    <div id="resetForm" class="reset password form" style="display:none;">
+      <header>Восстановление пароля</header>
+      <form action="#" name="reset">
+        <input required type="email" name="email" placeholder="Введите свою электронную почту">
+        <input type="submit" class="button" value="Восстановить пароль">
+      </form>
+      <div class="signup">
+        <span class="signup">Вспомнили пароль?
+          <label for="check" id="loginLinkFromReset">Авторизация</label>
+        </span>
+      </div>
+    </div>
+    <div id="registrationForm" class="registration form" style="display:none;">
       <header>Регистрация</header>
       <form action="#" name="registration">
         <input required type="text" name="name" placeholder="Введите своё имя">
@@ -53,7 +65,7 @@
       </form>
       <div class="signup">
         <span class="signup">У вас уже есть аккаунт?
-          <label for="check">Авторизация</label>
+          <label for="check" id="loginLinkFromRegister">Авторизация</label>
         </span>
       </div>
     </div>
@@ -63,6 +75,29 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       setupEmailAutocomplete();
+
+      function showForm(formId) {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('resetForm').style.display = 'none';
+        document.getElementById('registrationForm').style.display = 'none';
+        document.getElementById(formId).style.display = 'block';
+      }
+
+      document.getElementById('registerLink').addEventListener('click', function() {
+        showForm('registrationForm');
+      });
+
+      document.getElementById('forgotPasswordLink').addEventListener('click', function() {
+        showForm('resetForm');
+      });
+
+      document.getElementById('loginLinkFromReset').addEventListener('click', function() {
+        showForm('loginForm');
+      });
+
+      document.getElementById('loginLinkFromRegister').addEventListener('click', function() {
+        showForm('loginForm');
+      });
     });
   </script>
 </body>

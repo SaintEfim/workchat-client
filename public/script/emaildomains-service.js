@@ -1,6 +1,8 @@
+const emailDomainsServiceUrl = `http://localhost:1002/api/v1/email-domains?withIncludes=false`;
+
 async function getEmailDomains() {
     try {
-        const response = await fetch('http://localhost:1002/api/v1/email-domains?withIncludes=false', {
+        const response = await fetch(emailDomainsServiceUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -26,7 +28,7 @@ async function getEmailDomains() {
     }
 }
 
-async function setupEmailAutocomplete() {
+export async function setupEmailAutocomplete() {
     const emailInput = document.getElementById('email');
     const datalist = document.getElementById('emailDomains');
     const suggestionsDiv = document.getElementById('emailSuggestions');

@@ -2,11 +2,11 @@
 
 // берём Express
 import express from 'express';
-import { fileURLToPath } from 'url'
-import path from 'path'
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // создаём Express-приложение
 var app = express();
@@ -19,7 +19,5 @@ app.get('/', function(req, res) {
   res.sendFile('public/login-and-registration-index.html', { root: __dirname });
 });
 
-// запускаем сервер на порту 4200
+// запускаем сервер на порту, указанном в конфигурации 
 app.listen(4200);
-// отправляем сообщение
-console.log('Сервер стартовал!');

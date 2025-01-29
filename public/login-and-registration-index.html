@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,12 +8,11 @@
   <link rel="stylesheet" type="text/css" href="css/login-and-registration-style.css">
 
   <!-- Загружаем скрипты с defer, чтобы они выполнились после загрузки DOM -->
-  <script src="script/registration-service.js" defer></script>
-  <script src="script/authentication-service.js" defer></script>
-  <script src="script/employees-service.js" defer></script>
-  <script src="script/emaildomains-service.js" defer></script>
+  <script type="module" src="script/registration-service.js" defer></script>
+  <script type="module" src="script/authentication-service.js" defer></script>
+  <script type="module" src="script/employees-service.js" defer></script>
+  <script type="module" src="script/emaildomains-service.js" defer></script>
 </head>
-
 <body>
   <div class="container">
     <input type="checkbox" id="check">
@@ -72,7 +73,9 @@
   </div>
 
   <!-- Запускаем функцию, когда страница полностью загружена -->
-  <script>
+  <script type="module">
+    import { setupEmailAutocomplete } from './script/emaildomains-service.js';
+
     document.addEventListener("DOMContentLoaded", function () {
       setupEmailAutocomplete();
 
@@ -101,3 +104,4 @@
     });
   </script>
 </body>
+</html>

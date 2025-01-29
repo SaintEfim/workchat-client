@@ -1,5 +1,7 @@
+const employeesServiceUrl = `http://localhost:1003/api/v1/positions?withIncludes=false`;
+
 function getPosition() {
-    fetch('http://localhost:1003/api/v1/positions?withIncludes=false', {
+    fetch(employeesServiceUrl, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

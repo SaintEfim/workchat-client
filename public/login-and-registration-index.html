@@ -1,0 +1,68 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Login & Registration Form</title>
+  <link rel="stylesheet" type="text/css" href="css/login-and-registration-style.css">
+
+  <!-- Загружаем скрипты с defer, чтобы они выполнились после загрузки DOM -->
+  <script src="script/registration-service.js" defer></script>
+  <script src="script/authentication-service.js" defer></script>
+  <script src="script/employees-service.js" defer></script>
+  <script src="script/emaildomains-service.js" defer></script>
+</head>
+
+<body>
+  <div class="container">
+    <input type="checkbox" id="check">
+    <div class="login form">
+      <header>Авторизация</header>
+      <form action="#" name="authorize">
+        <input required type="email" name="email" placeholder="Введите свою электронную почту">
+        <input required type="password" name="password" placeholder="Введите свой пароль">
+        <a href="#">Забыли пароль?</a>
+        <input type="submit" class="button" value="Авторизоваться">
+      </form>
+      <div class="signup">
+        <span class="signup">Хотите зарегистрироваться?
+          <label for="check">Регистрация</label>
+        </span>
+      </div>
+    </div>
+    <div class="registration form">
+      <header>Регистрация</header>
+      <form action="#" name="registration">
+        <input required type="text" name="name" placeholder="Введите своё имя">
+        <input required type="text" name="surname" placeholder="Введите свою фамилию">
+        <input type="text" name="patronymic" placeholder="Введите своё отчество (необязательно)">
+
+        <div style="position: relative;">
+          <input required type="email" name="email" id="email" placeholder="Введите свою электронную почту" list="emailDomains">
+          <datalist id="emailDomains"></datalist>
+          <div class="email-suggestions" id="emailSuggestions"></div>
+        </div>
+
+        <input required type="password" name="password" placeholder="Введите свой пароль">
+        <input required type="password" placeholder="Подтвердите пароль">
+        <input type="hidden" name="positionId" value="">
+
+        <select required name="position" id="pet-select">
+          <option value="" disabled selected>Выберите профессию</option>
+        </select>
+        <input type="submit" class="button" value="Зарегистрироваться">
+      </form>
+      <div class="signup">
+        <span class="signup">У вас уже есть аккаунт?
+          <label for="check">Авторизация</label>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Запускаем функцию, когда страница полностью загружена -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      setupEmailAutocomplete();
+    });
+  </script>
+</body>

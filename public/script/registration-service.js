@@ -1,3 +1,5 @@
+const registrationServiceUrl = `http://localhost:1001/api/v1/registration/register`;
+
 const userRegistration = {
     name: '',
     surname: '',
@@ -15,7 +17,7 @@ document.forms.registration.onsubmit = function () {
     userRegistration.password = this.password.value;
     userRegistration.positionId = this.positionId.value;
     
-    fetch('http://localhost:1001/api/v1/registration/register', {
+    fetch(registrationServiceUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

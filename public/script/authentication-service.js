@@ -1,3 +1,5 @@
+const authenticationServiceUrl = `http://localhost:1005/api/v1/authentication/login`;
+
 const userAuthentication = {
     email: '',
     password: '',
@@ -7,7 +9,7 @@ document.forms.authorize.onsubmit = function () {
     userAuthentication.email = this.email.value;
     userAuthentication.password = this.password.value;
     
-    fetch('http://localhost:1005/api/v1/authentication/login', {
+    fetch(authenticationServiceUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

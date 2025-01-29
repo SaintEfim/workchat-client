@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkChat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="css/chat.css">
+</head>
+<body>
+    <!-- Меню настроек -->
+    <div class="settings-menu" id="settingsMenu">
+        <div class="menu-header">
+            <div class="menu-avatar"></div>
+            <div class="menu-user-info">
+                <h3>Иван Петров</h3>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-item">
+                <i class="fas fa-user-friends"></i> Контакты
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-phone"></i> Звонки
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-bookmark"></i> Избранное
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-cog"></i> Настройки
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-moon"></i> Ночной режим
+            </div>
+            <div class="menu-item" style="color: #ff3b30;">
+                <i class="fas fa-sign-out-alt"></i> Выйти
+            </div>
+        </div>
+    </div>
+
+    <!-- Боковая панель -->
+    <div class="sidebar">
+        <div class="header">
+            <div class="menu-toggle" onclick="toggleSettingsMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="header-title">WorkChat</div>
+            <div class="user-menu">
+                <div class="dropdown-menu">
+                    <div class="dropdown-item">
+                        <i class="fas fa-user-circle"></i> Профиль
+                    </div>
+                    <div class="dropdown-item">
+                        <i class="fas fa-cog"></i> Настройки
+                    </div>
+                    <div class="dropdown-item">
+                        <i class="fas fa-moon"></i> Ночной режим
+                    </div>
+                    <div class="dropdown-item" style="color: #ff3b30;">
+                        <i class="fas fa-sign-out-alt"></i> Выйти
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Поиск">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div class="chat-list">
+            <div class="chat-item">
+                <div class="chat-avatar"></div>
+                <div>
+                    <h4>Андрей Телеграмов</h4>
+                    <p>Привет! Как насчет встречи завтра?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основное окно чата -->
+    <div class="main-chat">
+        <div class="message-container">
+            <div class="message">
+                Привет! Как дела?
+                <div class="message-time">12:34</div>
+            </div>
+            
+            <div class="message outgoing">
+                Всё отлично, спасибо!
+                <div class="message-time">12:35 ✓✓</div>
+            </div>
+        </div>
+
+        <div class="message-input-container">
+            <div class="attach-button">
+                <i class="fas fa-paperclip"></i>
+            </div>
+            <input type="text" class="message-input" placeholder="Введите сообщение...">
+            <div class="send-button">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Управление меню настроек
+        function toggleSettingsMenu() {
+            document.getElementById('settingsMenu').classList.toggle('active');
+        }
+
+        // Управление меню пользователя
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const menu = document.querySelector('.dropdown-menu');
+            menu.classList.toggle('show');
+        }
+
+        // Закрытие меню при клике вне области
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.settings-menu') && 
+                !e.target.closest('.menu-toggle')) {
+                document.getElementById('settingsMenu').classList.remove('active');
+            }
+
+            if (!e.target.closest('.user-menu')) {
+                document.querySelector('.dropdown-menu').classList.remove('show');
+            }
+        });
+
+        // Анимация ввода сообщения
+        document.querySelector('.message-input').addEventListener('focus', function() {
+            this.parentElement.style.background = '#e6e8eb';
+        });
+
+        document.querySelector('.message-input').addEventListener('blur', function() {
+            this.parentElement.style.background = '#f0f2f5';
+        });
+    </script>
+</body>
+</html>

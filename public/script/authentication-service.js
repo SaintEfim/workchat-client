@@ -30,11 +30,12 @@ document.forms.authorize.onsubmit = function () {
         console.log('Response:', data);
 
         if (data.accessToken && data.refreshToken) {
-            alert("Успешная авторизация")
-            document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${data.ExpiresIn}; SameSite=Strict`;
-            document.cookie = `refreshToken=${data.refreshToken}; path=/; max-age=${data.ExpiresIn}; SameSite=Strict`;
+            document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${data.expiresIn}; SameSite=Strict`;
+            document.cookie = `refreshToken=${data.refreshToken}; path=/; max-age=${data.expiresIn}; SameSite=Strict`;
 
             console.log('Tokens have been saved to cookies');
+
+            window.location.href = 'chat';
         }
     })
     .catch((error) => {

@@ -15,10 +15,6 @@ body {
   background: #088dc2;
 }
 
-#email {
-  margin-bottom: 0; /* Убираем нижний отступ у инпута */
-}
-
 .email-suggestions {
   margin-top: 0px;
   padding-top: 0;

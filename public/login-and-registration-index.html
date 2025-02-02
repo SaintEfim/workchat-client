@@ -7,7 +7,7 @@
   <title>Login & Registration Form</title>
   <link rel="stylesheet" type="text/css" href="css/login-and-registration-style.css">
 
-  <!-- Загружаем скрипты с defer, чтобы они выполнились после загрузки DOM -->
+  <!-- Подключаем скрипты с defer, чтобы они выполнялись после загрузки DOM -->
   <script type="module" src="script/registration-service.js" defer></script>
   <script type="module" src="script/authentication-service.js" defer></script>
   <script type="module" src="script/employees-service-position.js" defer></script>
@@ -16,9 +16,10 @@
 <body>
   <div class="container">
     <input type="checkbox" id="check">
+    <!-- Форма авторизации -->
     <div id="loginForm" class="login form">
       <header>Авторизация</header>
-      <form action="#" name="authorize">
+      <form name="authorize">
         <input required type="email" name="email" placeholder="Введите свою электронную почту">
         <input required type="password" name="password" placeholder="Введите свой пароль">
         <a href="#" id="forgotPasswordLink">Забыли пароль?</a>
@@ -30,9 +31,10 @@
         </span>
       </div>
     </div>
+    <!-- Форма восстановления пароля -->
     <div id="resetForm" class="reset password form" style="display:none;">
       <header>Восстановление пароля</header>
-      <form action="#" name="reset">
+      <form name="reset">
         <input required type="email" name="email" placeholder="Введите свою электронную почту">
         <input type="submit" class="button" value="Восстановить пароль">
       </form>
@@ -42,9 +44,10 @@
         </span>
       </div>
     </div>
+    <!-- Форма регистрации -->
     <div id="registrationForm" class="registration form" style="display:none;">
       <header>Регистрация</header>
-      <form action="#" name="registration">
+      <form name="registration">
         <input required type="text" name="name" placeholder="Введите своё имя">
         <input required type="text" name="surname" placeholder="Введите свою фамилию">
         <input type="text" name="patronymic" placeholder="Введите своё отчество (необязательно)">
@@ -57,6 +60,7 @@
 
         <input required type="password" name="password" placeholder="Введите свой пароль">
         <input required type="password" placeholder="Подтвердите пароль">
+        <!-- Скрытое поле для передачи идентификатора должности -->
         <input type="hidden" name="positionId" value="">
 
         <select required name="position" id="pet-select">
@@ -72,11 +76,11 @@
     </div>
   </div>
 
-  <!-- Запускаем функцию, когда страница полностью загружена -->
+  <!-- Инициализация переключения форм -->
   <script type="module">
     import { setupEmailAutocomplete } from './script/emaildomains-service.js';
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", () => {
       setupEmailAutocomplete();
 
       function showForm(formId) {
@@ -86,19 +90,16 @@
         document.getElementById(formId).style.display = 'block';
       }
 
-      document.getElementById('registerLink').addEventListener('click', function() {
+      document.getElementById('registerLink').addEventListener('click', () => {
         showForm('registrationForm');
       });
-
-      document.getElementById('forgotPasswordLink').addEventListener('click', function() {
+      document.getElementById('forgotPasswordLink').addEventListener('click', () => {
         showForm('resetForm');
       });
-
-      document.getElementById('loginLinkFromReset').addEventListener('click', function() {
+      document.getElementById('loginLinkFromReset').addEventListener('click', () => {
         showForm('loginForm');
       });
-
-      document.getElementById('loginLinkFromRegister').addEventListener('click', function() {
+      document.getElementById('loginLinkFromRegister').addEventListener('click', () => {
         showForm('loginForm');
       });
     });

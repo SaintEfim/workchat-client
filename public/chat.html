@@ -4,12 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WorkChat</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="css/chat.css" />
     <script type="module" src="script/logout.js"></script>
+    <!-- Подключаем основной скрипт с логикой работы -->
     <script type="module" src="script/employees-service.js" defer></script>
   </head>
   <body>
@@ -21,8 +19,8 @@
           <h3>Иван Петров</h3>
         </div>
       </div>
-
       <div class="menu-section">
+        <!-- Модальное окно профиля открывается только по клику на этот элемент -->
         <div class="menu-item">
           <i class="fas fa-user-circle"></i>Мой профиль
         </div>
@@ -59,6 +57,7 @@
         </div>
       </div>
 
+      <!-- Поиск коллег -->
       <div class="search-container">
         <input type="text" class="search-input" placeholder="Поиск" />
         <i class="fas fa-search search-icon"></i>
@@ -82,69 +81,23 @@
           Привет! Как дела?
           <div class="message-time">12:34</div>
         </div>
-
         <div class="message outgoing">
           Всё отлично, спасибо!
           <div class="message-time">12:35 ✓✓</div>
         </div>
       </div>
-
       <div class="message-input-container">
         <div class="attach-button">
           <i class="fas fa-paperclip"></i>
         </div>
-        <input
-          type="text"
-          class="message-input"
-          placeholder="Введите сообщение..."
-        />
+        <input type="text" class="message-input" placeholder="Введите сообщение..." />
         <div class="send-button">
           <i class="fas fa-paper-plane"></i>
         </div>
       </div>
     </div>
 
-    <script>
-      // Управление меню настроек
-      function toggleSettingsMenu() {
-        document.getElementById("settingsMenu").classList.toggle("active");
-      }
-
-      // Управление меню пользователя
-      function toggleUserMenu(event) {
-        event.stopPropagation();
-        const menu = document.querySelector(".dropdown-menu");
-        menu.classList.toggle("show");
-      }
-
-      // Закрытие меню при клике вне области
-      document.addEventListener("click", function (e) {
-        if (
-          !e.target.closest(".settings-menu") &&
-          !e.target.closest(".menu-toggle")
-        ) {
-          document.getElementById("settingsMenu").classList.remove("active");
-        }
-
-        if (!e.target.closest(".user-menu")) {
-          document.querySelector(".dropdown-menu").classList.remove("show");
-        }
-      });
-
-      // Анимация ввода сообщения
-      document
-        .querySelector(".message-input")
-        .addEventListener("focus", function () {
-          this.parentElement.style.background = "#e6e8eb";
-        });
-
-      document
-        .querySelector(".message-input")
-        .addEventListener("blur", function () {
-          this.parentElement.style.background = "#f0f2f5";
-        });
-    </script>
-    <!-- Модальное окно профиля -->
+    <!-- Модальное окно профиля (открывается только по клику на "Мой профиль") -->
     <div class="profile-modal" id="profileModal">
       <div class="profile-modal-content">
         <div class="profile-modal-header">
@@ -152,22 +105,51 @@
           <button class="close-btn">&times;</button>
         </div>
         <div class="profile-info">
-            <div class="profile-container">
-                <div class="avatar"></div>
-                <div class="user-main-info">
-                    <h3 id="profileName"></h3>
-                </div>
+          <div class="profile-container">
+            <div class="avatar"></div>
+            <div class="user-main-info">
+              <h3 id="profileName"></h3>
             </div>
+          </div>
           <div class="details-section">
             <div class="detail-item" id="positionSection">
-                <span class="detail-label">Должность:</span>
-                <span id="profilePosition"></span>
-              </div>    
-          </div>
-        </div> 
+              <span class="detail-label">Должность:</span>
+              <span id="profilePosition"></span>
+              <span class="detail-label">Почта:</span>
+              <span id="profileEmail"></span>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    
+    <script>
+      // UI-логика для управления меню и прочими эффектами (можно также вынести в отдельный файл)
+      function toggleSettingsMenu() {
+        document.getElementById("settingsMenu").classList.toggle("active");
+      }
+      
+      function toggleUserMenu(event) {
+        event.stopPropagation();
+        const menu = document.querySelector(".dropdown-menu");
+        menu.classList.toggle("show");
+      }
+      
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".settings-menu") && !e.target.closest(".menu-toggle")) {
+          document.getElementById("settingsMenu").classList.remove("active");
+        }
+        if (!e.target.closest(".user-menu")) {
+          document.querySelector(".dropdown-menu").classList.remove("show");
+        }
+      });
+      
+      document.querySelector(".message-input").addEventListener("focus", function () {
+        this.parentElement.style.background = "#e6e8eb";
+      });
+      document.querySelector(".message-input").addEventListener("blur", function () {
+        this.parentElement.style.background = "#f0f2f5";
+      });
+    </script>
   </body>
 </html>

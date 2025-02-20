@@ -75,6 +75,8 @@ async function fetchCurrentUser() {
  * @returns {Promise<Array>}
  */
 async function fetchEmployeesByQuery(query) {
+  const userId = getUserId();
+
   const accessToken = getAccessToken();
   if (!accessToken) {
     throw new Error("Access token not found in cookies");
@@ -106,7 +108,7 @@ async function fetchEmployeesByQuery(query) {
   }
 
   const data = await response.json();
-  return data;
+  return data.filter(employee => employee.id !== userId);a;
 }
 
 // ==============================
@@ -198,9 +200,96 @@ function restoreDefaultChatList() {
  * Реализуйте логику по необходимости.
  * @param {Object} employee
  */
-function openChatWithEmployee(employee) {
-  console.log("Открываем чат с сотрудником:", employee);
-  // Здесь можно реализовать переход в окно чата или иную логику.
+async function openChatWithEmployee(employee) {
+  try {
+    // Получаем данные текущего пользователя
+    const currentUser = await fetchCurrentUser();
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      throw new Error("Access token not найден");
+    }
+
+    // Формируем объект для создания чата
+    const chatData = {
+      name: ``,
+      is_group: false,
+      employee_ids: [currentUser.id, employee.id]
+    };
+
+    // Выполняем POST запрос к chat service
+    const response = await fetch('http://localhost:1006/api/v1/chats', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        //'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify(chatData)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ошибка создания чата: ${response.status}`);
+    }
+
+    const createdChat = await response.json();
+    console.log("Чат успешно создан:", createdChat);
+
+    // После создания обновляем окно чата – загружаем историю сообщений
+    loadChatMessages(createdChat.id);
+  } catch (error) {
+    console.error("Ошибка при создании чата", error);
+  }
+}
+
+/**
+ * Функция для загрузки сообщений созданного чата и обновления UI
+ * @param {string} chatId – идентификатор созданного чата
+ */
+async function loadChatMessages(chatId) {
+  // // Находим контейнер для сообщений в основном окне чата
+  // const messageContainer = document.querySelector('.main-chat .message-container');
+  // if (!messageContainer) return;
+
+  // // Очищаем предыдущие сообщения
+  // messageContainer.innerHTML = '';
+
+  // try {
+  //   // Здесь можно сделать запрос к API, который возвращает сообщения для chatId.
+  //   // Например, если у вас есть endpoint по типу:
+  //   // http://localhost:1006/api/v1/chats/{chatId}/messages
+  //   const accessToken = getAccessToken();
+  //   const response = await fetch(`http://localhost:1006/api/v1/chats/${chatId}/messages`, {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       //'Authorization': `Bearer ${accessToken}`
+  //     }
+  //   });
+
+  //   if (!response.ok) {
+  //     throw new Error(`Ошибка загрузки сообщений: ${response.status}`);
+  //   }
+
+  //   const messages = await response.json();
+
+  //   // Пример отображения сообщений
+  //   messages.forEach(message => {
+  //     const messageEl = document.createElement('div');
+  //     // Определяем класс в зависимости от того, кто отправил сообщение
+  //     messageEl.classList.add('message');
+  //     if (message.senderId === currentUser.id) { // если нужно, можно сравнить с id текущего пользователя
+  //       messageEl.classList.add('outgoing');
+  //     }
+  //     messageEl.textContent = message.text;
+
+  //     const timeEl = document.createElement('div');
+  //     timeEl.classList.add('message-time');
+  //     timeEl.textContent = message.time; // формат времени по вашему усмотрению
+
+  //     messageEl.appendChild(timeEl);
+  //     messageContainer.appendChild(messageEl);
+  //   });
+  // } catch (error) {
+  //   console.error("Ошибка загрузки сообщений", error);
+  // }
 }
 
 // ==============================

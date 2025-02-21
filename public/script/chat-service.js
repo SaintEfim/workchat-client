@@ -1,67 +1,107 @@
 // chat-service.js
 
-// =======================================
-// Константы URL API для чатов
-// =======================================
+import { fetchCurrentUser, getAccessToken } from './employees-service.js';
+
+
+// Константа URL API для сервиса чатов
 const CHAT_API_URL = 'http://localhost:1006/api/v1/chats';
 
-// =======================================
-// ФУНКЦИИ ДЛЯ РАБОТЫ С ЧАТАМИ
-// =======================================
 /**
- * Создает новый чат через API chat service.
- * Формирует DTO согласно структуре ChatCreate:
- * {
- *   name: string,
- *   is_group: boolean,
- *   employee_ids: [uuid, uuid]
- * }
+ * Создает новый чат с выбранным сотрудником.
  * @param {Object} employee – выбранный сотрудник.
- * @returns {Promise<Object>} – данные созданного чата.
+ * @returns {Promise<Object>} – объект созданного чата.
  */
 async function createChat(employee) {
-  // Предполагается, что функции getAccessToken() и getUserId() доступны глобально
-  const accessToken = getAccessToken();
-  const currentUserId = getUserId();
+  // Используем функции fetchCurrentUser и getAccessToken из employee-service.js
+  try {
+    const currentUser = await fetchCurrentUser();
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      throw new Error("Access token не найден");
+    }
 
-  if (!currentUserId || !accessToken) {
-    throw new Error("User ID или access token не найдены");
+    // Формируем объект для создания чата (ChatCreate DTO)
+    const chatData = {
+      name: ``,
+      is_group: false,
+      employee_ids: [currentUser.id, employee.id]
+    };
+
+    const response = await fetch(CHAT_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        //'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify(chatData)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ошибка создания чата: ${response.status}`);
+    }
+
+    const createdChat = await response.json();
+    console.log("Чат успешно создан:", createdChat);
+    return createdChat;
+  } catch (error) {
+    console.error("Ошибка при создании чата", error);
+    throw error;
   }
-
-  const chatCreateDto = {
-    name: `Чат с ${employee.name} ${employee.surname}`,
-    is_group: false,
-    employee_ids: [currentUserId, employee.id]
-  };
-
-  const response = await fetch(CHAT_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(chatCreateDto)
-  });
-
-  if (!response.ok) {
-    throw new Error(`Ошибка при создании чата! Статус: ${response.status}`);
-  }
-
-  return await response.json();
 }
 
 /**
- * Открывает чат с выбранным сотрудником.
- * Вызывает API для создания чата, а затем открывает окно чата.
- * @param {Object} employee
+ * Загружает сообщения для созданного чата и обновляет UI.
+ * @param {string} chatId – идентификатор созданного чата.
+ */
+async function loadChatMessages(chatId) {
+  const messageContainer = document.querySelector('.main-chat .message-container');
+  if (!messageContainer) return;
+
+  // Очищаем предыдущие сообщения
+  messageContainer.innerHTML = '';
+
+  try {
+    const accessToken = getAccessToken();
+    const response = await fetch(`http://localhost:1006/api/v1/chats/${chatId}/messages`, {
+      headers: {
+        'Content-Type': 'application/json',
+        //'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ошибка загрузки сообщений: ${response.status}`);
+    }
+
+    const messages = await response.json();
+
+    messages.forEach(message => {
+      const messageEl = document.createElement('div');
+      messageEl.classList.add('message');
+      // При желании можно сравнить senderId с id текущего пользователя для добавления класса 'outgoing'
+      messageEl.textContent = message.text;
+
+      const timeEl = document.createElement('div');
+      timeEl.classList.add('message-time');
+      timeEl.textContent = message.time;
+
+      messageEl.appendChild(timeEl);
+      messageContainer.appendChild(messageEl);
+    });
+  } catch (error) {
+    console.error("Ошибка загрузки сообщений", error);
+  }
+}
+
+/**
+ * Обрабатывает процесс открытия чата с выбранным сотрудником.
+ * @param {Object} employee – выбранный сотрудник.
  */
 export async function openChatWithEmployee(employee) {
   try {
-    const chat = await createChat(employee);
-    console.log("Чат успешно создан:", chat);
-    // Здесь можно реализовать логику открытия окна чата, например:
-    // window.location.href = `chat.html?chatId=${chat.id}`;
+    const createdChat = await createChat(employee);
+    loadChatMessages(createdChat.id);
   } catch (error) {
-    console.error("Ошибка при открытии чата:", error);
+    console.error("Ошибка при открытии чата", error);
   }
 }

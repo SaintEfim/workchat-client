@@ -1,9 +1,12 @@
-// Константы URL API
+// employee-service.js
+import { openChatWithEmployee } from './chat-service.js';
+
+// Константы URL API для сотрудников
 const API_BASE_URL = 'http://localhost:1003/api/v1/employees';
 const EMPLOYEE_API_URL = `${API_BASE_URL}/`; // для получения текущего сотрудника
 
-// Глобальные переменные
-let defaultChatListHTML = ""; // исходный HTML списка чатов
+// Глобальная переменная для сохранения исходного HTML списка чатов
+let defaultChatListHTML = "";
 
 // ==============================
 // UTILS
@@ -25,7 +28,7 @@ function getCookie(name) {
  * Получает токен доступа из cookie.
  * @returns {string|null}
  */
-function getAccessToken() {
+export function getAccessToken() {
   return getCookie('accessToken');
 }
 
@@ -45,7 +48,7 @@ function getUserId() {
  * Получает данные текущего сотрудника с сервера.
  * @returns {Promise<Object>}
  */
-async function fetchCurrentUser() {
+export async function fetchCurrentUser() {
   const userId = getUserId();
   const accessToken = getAccessToken();
 
@@ -76,7 +79,6 @@ async function fetchCurrentUser() {
  */
 async function fetchEmployeesByQuery(query) {
   const userId = getUserId();
-
   const accessToken = getAccessToken();
   if (!accessToken) {
     throw new Error("Access token not found in cookies");
@@ -108,7 +110,7 @@ async function fetchEmployeesByQuery(query) {
   }
 
   const data = await response.json();
-  return data.filter(employee => employee.id !== userId);a;
+  return data.filter(employee => employee.id !== userId);
 }
 
 // ==============================
@@ -177,7 +179,7 @@ function updateChatList(employees) {
       </div>
     `;
 
-    // При клике на сотрудника открываем чат (а не профиль)
+    // При клике вызываем функцию из chat-service.js для создания/открытия чата
     chatItem.addEventListener("click", () => {
       openChatWithEmployee(employee);
     });
@@ -193,103 +195,6 @@ function restoreDefaultChatList() {
   if (chatListContainer && defaultChatListHTML) {
     chatListContainer.innerHTML = defaultChatListHTML;
   }
-}
-
-/**
- * Функция открытия чата с выбранным сотрудником.
- * Реализуйте логику по необходимости.
- * @param {Object} employee
- */
-async function openChatWithEmployee(employee) {
-  try {
-    // Получаем данные текущего пользователя
-    const currentUser = await fetchCurrentUser();
-    const accessToken = getAccessToken();
-    if (!accessToken) {
-      throw new Error("Access token not найден");
-    }
-
-    // Формируем объект для создания чата
-    const chatData = {
-      name: ``,
-      is_group: false,
-      employee_ids: [currentUser.id, employee.id]
-    };
-
-    // Выполняем POST запрос к chat service
-    const response = await fetch('http://localhost:1006/api/v1/chats', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        //'Authorization': `Bearer ${accessToken}`
-      },
-      body: JSON.stringify(chatData)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Ошибка создания чата: ${response.status}`);
-    }
-
-    const createdChat = await response.json();
-    console.log("Чат успешно создан:", createdChat);
-
-    // После создания обновляем окно чата – загружаем историю сообщений
-    loadChatMessages(createdChat.id);
-  } catch (error) {
-    console.error("Ошибка при создании чата", error);
-  }
-}
-
-/**
- * Функция для загрузки сообщений созданного чата и обновления UI
- * @param {string} chatId – идентификатор созданного чата
- */
-async function loadChatMessages(chatId) {
-  // // Находим контейнер для сообщений в основном окне чата
-  // const messageContainer = document.querySelector('.main-chat .message-container');
-  // if (!messageContainer) return;
-
-  // // Очищаем предыдущие сообщения
-  // messageContainer.innerHTML = '';
-
-  // try {
-  //   // Здесь можно сделать запрос к API, который возвращает сообщения для chatId.
-  //   // Например, если у вас есть endpoint по типу:
-  //   // http://localhost:1006/api/v1/chats/{chatId}/messages
-  //   const accessToken = getAccessToken();
-  //   const response = await fetch(`http://localhost:1006/api/v1/chats/${chatId}/messages`, {
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       //'Authorization': `Bearer ${accessToken}`
-  //     }
-  //   });
-
-  //   if (!response.ok) {
-  //     throw new Error(`Ошибка загрузки сообщений: ${response.status}`);
-  //   }
-
-  //   const messages = await response.json();
-
-  //   // Пример отображения сообщений
-  //   messages.forEach(message => {
-  //     const messageEl = document.createElement('div');
-  //     // Определяем класс в зависимости от того, кто отправил сообщение
-  //     messageEl.classList.add('message');
-  //     if (message.senderId === currentUser.id) { // если нужно, можно сравнить с id текущего пользователя
-  //       messageEl.classList.add('outgoing');
-  //     }
-  //     messageEl.textContent = message.text;
-
-  //     const timeEl = document.createElement('div');
-  //     timeEl.classList.add('message-time');
-  //     timeEl.textContent = message.time; // формат времени по вашему усмотрению
-
-  //     messageEl.appendChild(timeEl);
-  //     messageContainer.appendChild(messageEl);
-  //   });
-  // } catch (error) {
-  //   console.error("Ошибка загрузки сообщений", error);
-  // }
 }
 
 // ==============================
@@ -313,7 +218,7 @@ async function init() {
     console.error("Ошибка при получении данных текущего пользователя:", error);
   }
 
-  // Обработчик для открытия профиля (только по клику на "Мой профиль")
+  // Обработчик для открытия профиля (по клику на "Мой профиль")
   document
     .querySelector(".menu-item:nth-child(1)")
     .addEventListener("click", async () => {
@@ -356,5 +261,5 @@ async function init() {
   }
 }
 
-// Запускаем инициализацию после загрузки DOM
+// Запуск инициализации после загрузки DOM
 document.addEventListener("DOMContentLoaded", init);

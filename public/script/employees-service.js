@@ -1,22 +1,9 @@
-// employee-service.js
+// employees-service.js
 import { openChatWithEmployee } from './chat-service.js';
 
-// Константы URL API для сотрудников
 const API_BASE_URL = 'http://localhost:1003/api/v1/employees';
-const EMPLOYEE_API_URL = `${API_BASE_URL}/`; // для получения текущего сотрудника
+const EMPLOYEE_API_URL = `${API_BASE_URL}/`;
 
-// Глобальная переменная для сохранения исходного HTML списка чатов
-let defaultChatListHTML = "";
-
-// ==============================
-// UTILS
-// ==============================
-
-/**
- * Извлекает значение cookie по имени.
- * @param {string} name – имя cookie.
- * @returns {string|null}
- */
 function getCookie(name) {
   const value = document.cookie
     .split('; ')
@@ -24,29 +11,16 @@ function getCookie(name) {
   return value ? value.split('=')[1] : null;
 }
 
-/**
- * Получает токен доступа из cookie.
- * @returns {string|null}
- */
 export function getAccessToken() {
   return getCookie('accessToken');
 }
 
-/**
- * Получает идентификатор пользователя из cookie.
- * @returns {string|null}
- */
 function getUserId() {
   return getCookie('userId');
 }
 
-// ==============================
-// API FUNCTIONS
-// ==============================
-
 /**
  * Получает данные текущего сотрудника с сервера.
- * @returns {Promise<Object>}
  */
 export async function fetchCurrentUser() {
   const userId = getUserId();
@@ -68,14 +42,11 @@ export async function fetchCurrentUser() {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  const data = await response.json();
-  return data;
+  return await response.json();
 }
 
 /**
- * Выполняет поиск сотрудников по введённому запросу.
- * @param {string} query
- * @returns {Promise<Array>}
+ * Выполняет поиск сотрудников по введённому запросу (имя, фамилия, отчество).
  */
 async function fetchEmployeesByQuery(query) {
   const userId = getUserId();
@@ -110,16 +81,12 @@ async function fetchEmployeesByQuery(query) {
   }
 
   const data = await response.json();
+  // Исключаем из результатов самого текущего пользователя
   return data.filter(employee => employee.id !== userId);
 }
 
-// ==============================
-// UI FUNCTIONS
-// ==============================
-
 /**
- * Обновляет информацию о текущем пользователе в меню.
- * @param {Object} employee
+ * Обновляет информацию о текущем пользователе в меню (шапка).
  */
 function updateUserInfo(employee) {
   const userInfoElement = document.querySelector('.menu-user-info h3');
@@ -130,35 +97,33 @@ function updateUserInfo(employee) {
 
 /**
  * Открывает модальное окно профиля текущего пользователя.
- * @param {Object} employee
  */
 function showProfileModal(employee) {
   const modal = document.getElementById("profileModal");
+  if (!modal) return;
+
   modal.style.display = "flex";
   document.getElementById("profileName").textContent =
     `${employee.name} ${employee.surname} ${employee.patronymic || ""}`;
   document.getElementById("profilePosition").textContent =
     employee.position?.name || "Должность не указана";
   document.getElementById("profileEmail").textContent = employee.email || "";
-
-  const patronymicSection = document.getElementById("patronymicSection");
-  if (patronymicSection) {
-    patronymicSection.style.display = employee.patronymic ? "block" : "none";
-  }
 }
 
 /**
  * Закрывает модальное окно профиля.
  */
 function closeProfileModal() {
-  document.getElementById("profileModal").style.display = "none";
+  const modal = document.getElementById("profileModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
 }
 
 /**
- * Обновляет список сотрудников на странице.
- * @param {Array} employees
+ * Отображает список найденных сотрудников (результат поиска) вместо списка чатов.
  */
-function updateChatList(employees) {
+function showFoundEmployees(employees) {
   const chatListContainer = document.querySelector('.chat-list');
   if (!chatListContainer) return;
 
@@ -179,38 +144,19 @@ function updateChatList(employees) {
       </div>
     `;
 
-    // При клике вызываем функцию из chat-service.js для создания/открытия чата
+    // При клике — создаём/открываем приватный чат
     chatItem.addEventListener("click", () => {
       openChatWithEmployee(employee);
     });
+
     chatListContainer.appendChild(chatItem);
   });
 }
 
 /**
- * Восстанавливает исходное содержимое списка чатов.
- */
-function restoreDefaultChatList() {
-  const chatListContainer = document.querySelector('.chat-list');
-  if (chatListContainer && defaultChatListHTML) {
-    chatListContainer.innerHTML = defaultChatListHTML;
-  }
-}
-
-// ==============================
-// INITIALIZATION
-// ==============================
-
-/**
- * Инициализирует обработчики событий и загружает первоначальные данные.
+ * Инициализация: загрузка данных текущего пользователя, настройка поиска, модального окна профиля.
  */
 async function init() {
-  // Сохраняем исходный HTML списка чатов
-  const chatListContainer = document.querySelector('.chat-list');
-  if (chatListContainer) {
-    defaultChatListHTML = chatListContainer.innerHTML;
-  }
-
   try {
     const currentUser = await fetchCurrentUser();
     updateUserInfo(currentUser);
@@ -218,10 +164,10 @@ async function init() {
     console.error("Ошибка при получении данных текущего пользователя:", error);
   }
 
-  // Обработчик для открытия профиля (по клику на "Мой профиль")
-  document
-    .querySelector(".menu-item:nth-child(1)")
-    .addEventListener("click", async () => {
+  // Обработчик на "Мой профиль"
+  const profileMenuItem = document.querySelector(".menu-item:nth-child(1)");
+  if (profileMenuItem) {
+    profileMenuItem.addEventListener("click", async () => {
       try {
         const currentUser = await fetchCurrentUser();
         showProfileModal(currentUser);
@@ -229,29 +175,39 @@ async function init() {
         console.error("Ошибка при открытии профиля:", error);
       }
     });
+  }
 
-  // Обработчики закрытия модального окна профиля
-  document.querySelector(".close-btn").addEventListener("click", closeProfileModal);
-  document.querySelector(".profile-modal").addEventListener("click", (e) => {
-    if (e.target === document.querySelector(".profile-modal")) {
-      closeProfileModal();
-    }
-  });
+  // Закрытие профиля
+  const closeBtn = document.querySelector(".close-btn");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeProfileModal);
+  }
+  const profileModal = document.querySelector(".profile-modal");
+  if (profileModal) {
+    profileModal.addEventListener("click", (e) => {
+      if (e.target === profileModal) {
+        closeProfileModal();
+      }
+    });
+  }
 
-  // Обработчик ввода в поле поиска сотрудников
+  // Поиск сотрудников
   const searchInput = document.querySelector(".search-input");
   if (searchInput) {
     let debounceTimeout;
     searchInput.addEventListener("input", (e) => {
       clearTimeout(debounceTimeout);
-      const query = e.target.value;
+      const query = e.target.value.trim();
       debounceTimeout = setTimeout(async () => {
-        if (query.trim().length === 0) {
-          restoreDefaultChatList();
+        if (query.length === 0) {
+          // Если строка поиска пуста — грузим все чаты
+          import('./chat-service.js').then(module => {
+            module.loadUserChats();
+          });
         } else {
           try {
             const employees = await fetchEmployeesByQuery(query);
-            updateChatList(employees);
+            showFoundEmployees(employees);
           } catch (error) {
             console.error("Ошибка при поиске сотрудников:", error);
           }
@@ -261,5 +217,4 @@ async function init() {
   }
 }
 
-// Запуск инициализации после загрузки DOM
 document.addEventListener("DOMContentLoaded", init);

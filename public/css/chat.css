@@ -15,51 +15,75 @@ body {
 /* Боковая панель чатов */
 .sidebar {
   width: 360px;
+  height: 100vh;
   background: #f0f2f5;
   border-right: 1px solid #d3d9de;
   display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease;
+  flex-direction: row;
+  overflow: hidden;
 }
 
-/* Хедер */
-.header {
+/* --- НОВЫЕ СТИЛИ: вертикальное меню иконок --- */
+.vertical-menu {
+  width: 70px;
   background: #0088cc;
-  padding: 0 15px;
-  height: 60px;
+  padding: 0px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vertical-menu-item {
+  width: 40px;
+  height: 40px;
+  margin: 10px 0;
+  cursor: pointer;
+  color: #fff;
   display: flex;
   align-items: center;
-  color: white;
-  position: relative;
-}
-
-.menu-toggle {
-  cursor: pointer;
-  padding: 8px;
+  justify-content: center;
   transition: transform 0.2s;
+  position: relative;
+  padding: 5px 0;
 }
 
-.menu-toggle:hover {
-  transform: scale(1.1);
+.menu-item-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
 }
 
-.menu-toggle:active {
+.menu-item-label {
+  font-size: 10px;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
   transform: scale(0.9);
 }
 
-.header-title {
+.vertical-menu-item:hover {
+  transform: scale(1.1);
+}
+
+.vertical-menu-item i {
   font-size: 20px;
-  font-weight: 500;
-  flex: 1;
-  margin-left: 25%;
 }
 
 /* Поиск */
-.search-container {
-  padding: 12px 15px;
-  position: relative;
-}
 
+.sidebar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.search-container {
+  position: relative;
+  padding: 12px 15px;
+  flex-shrink: 0;
+}
 .search-input {
   width: 100%;
   padding: 8px 40px;
@@ -70,19 +94,15 @@ body {
   font-size: 14px;
   transition: box-shadow 0.2s;
 }
-
 .search-input:focus {
   outline: none;
   box-shadow: 0 0 0 2px #0088cc33;
 }
-
 .search-icon {
   position: absolute;
-  left: 30px;
+  left: 25px;
   top: 50%;
   transform: translateY(-50%);
-  color: #8e8e93;
-  font-size: 14px;
 }
 
 /* Список чатов */
@@ -101,12 +121,10 @@ body {
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .chat-item:hover {
   background: #f5f6f6;
   transform: translateX(5px);
 }
-
 .chat-avatar {
   width: 48px;
   height: 48px;
@@ -131,7 +149,6 @@ body {
   padding: 20px 15%;
   overflow-y: auto;
 }
-
 .message {
   max-width: 65%;
   padding: 8px 12px;
@@ -142,13 +159,11 @@ body {
   position: relative;
   transition: transform 0.2s, opacity 0.2s;
 }
-
 .message.outgoing {
   margin-left: auto;
   background: #e3f3fd;
   border-radius: 8px 8px 0 8px;
 }
-
 .message-time {
   font-size: 12px;
   color: #667781;
@@ -164,7 +179,6 @@ body {
   align-items: center;
   gap: 10px;
 }
-
 .message-input {
   flex: 1;
   padding: 12px 20px;
@@ -174,11 +188,9 @@ body {
   font-size: 15px;
   transition: all 0.2s;
 }
-
 .message-input:focus {
   box-shadow: 0 0 0 2px #0088cc33;
 }
-
 .attach-button,
 .send-button {
   width: 40px;
@@ -190,36 +202,30 @@ body {
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .attach-button {
   color: #0088cc;
   background: transparent;
 }
-
 .attach-button:hover {
   color: #006ba3;
   transform: rotate(45deg) scale(1.1);
 }
-
 .send-button {
   background: #0088cc;
   color: white;
 }
-
 .send-button:hover {
   background: #007ebd;
   transform: scale(1.1);
 }
-
 .send-button:active {
   transform: scale(0.9);
 }
 
-/* Меню пользователя */
+/* Меню пользователя (если используете dropdown в .user-menu) */
 .user-menu {
   position: relative;
 }
-
 .dropdown-menu {
   display: none;
   position: absolute;
@@ -234,7 +240,7 @@ body {
   animation: slideDown 0.3s ease;
 }
 
-/* Меню настроек */
+/* Меню настроек (выезжающее слева) */
 .settings-menu {
   position: fixed;
   left: -300px;
@@ -247,7 +253,6 @@ body {
   z-index: 1000;
   padding: 20px;
 }
-
 .settings-menu.active {
   left: 0;
 }
@@ -258,19 +263,18 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+/* Шапка меню настроек */
 .menu-header {
   display: flex;
   align-items: center;
   margin-bottom: 30px;
 }
-
 .menu-avatar {
   width: 60px;
   height: 60px;
@@ -279,11 +283,9 @@ body {
   margin-right: 15px;
   transition: transform 0.2s;
 }
-
 .menu-avatar:hover {
   transform: scale(1.05);
 }
-
 .menu-item {
   padding: 12px 15px;
   display: flex;
@@ -294,12 +296,12 @@ body {
   margin: 4px 0;
   transition: all 0.2s;
 }
-
 .menu-item:hover {
   background: #f5f6f6;
   transform: translateX(5px);
 }
 
+/* Модальное окно профиля */
 .profile-modal {
   display: none;
   position: fixed;
@@ -313,7 +315,6 @@ body {
   align-items: center;
   justify-content: center;
 }
-
 .profile-modal-content {
   background: white;
   width: 500px;
@@ -322,21 +323,18 @@ body {
   padding: 20px;
   animation: modalOpen 0.3s ease;
 }
-
 .profile-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
-
 .close-btn {
   background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
 }
-
 .avatar {
   width: 80px;
   height: 80px;
@@ -344,18 +342,15 @@ body {
   background: #0088cc;
   margin: 0 auto 15px;
 }
-
 .detail-item {
   margin: 10px 0;
   padding: 8px;
   border-radius: 8px;
 }
-
 .detail-label {
   color: #666;
   margin-right: 10px;
 }
-
 @keyframes modalOpen {
   from {
     opacity: 0;

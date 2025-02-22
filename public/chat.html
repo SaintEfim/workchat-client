@@ -4,15 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WorkChat</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <link rel="stylesheet" type="text/css" href="css/chat.css" />
     <script type="module" src="script/logout.js"></script>
-    <!-- Подключаем основной скрипт с логикой работы -->
     <script type="module" src="script/employees-service.js" defer></script>
-    <script type="module" src="script/chat-service.js" defer></script>    
+    <script type="module" src="script/chat-service.js" defer></script>
   </head>
   <body>
-    <!-- Меню настроек -->
+    <!-- Меню настроек (выезжающее слева) -->
     <div class="settings-menu" id="settingsMenu">
       <div class="menu-header">
         <div class="menu-avatar"></div>
@@ -21,12 +23,15 @@
         </div>
       </div>
       <div class="menu-section">
-        <!-- Модальное окно профиля открывается только по клику на этот элемент -->
         <div class="menu-item">
           <i class="fas fa-user-circle"></i>Мой профиль
         </div>
-        <div class="menu-item"><i class="fas fa-cog"></i> Настройки</div>
-        <div class="menu-item"><i class="fas fa-moon"></i> Ночной режим</div>
+        <div class="menu-item">
+          <i class="fas fa-cog"></i> Настройки
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-moon"></i> Ночной режим
+        </div>
         <div class="menu-item" style="color: #ff3b30">
           <i class="fas fa-sign-out-alt"></i> Выйти
         </div>
@@ -35,70 +40,50 @@
 
     <!-- Боковая панель -->
     <div class="sidebar">
-      <div class="header">
-        <div class="menu-toggle" onclick="toggleSettingsMenu()">
+      <!-- Вертикальное меню иконок -->
+      <div class="vertical-menu">
+        <div class="vertical-menu-item" onclick="toggleSettingsMenu()">
           <i class="fas fa-bars"></i>
         </div>
-        <div class="header-title">WorkChat</div>
-        <div class="user-menu">
-          <div class="dropdown-menu">
-            <div class="dropdown-item">
-              <i class="fas fa-user-circle"></i> Профиль
-            </div>
-            <div class="dropdown-item">
-              <i class="fas fa-cog"></i> Настройки
-            </div>
-            <div class="dropdown-item">
-              <i class="fas fa-moon"></i> Ночной режим
-            </div>
-            <div class="dropdown-item" style="color: #ff3b30">
-              <i class="fas fa-sign-out-alt"></i> Выйти
-            </div>
+        <div class="vertical-menu-item" id="allChatsBtn">
+          <div class="menu-item-content">
+            <i class="fas fa-comments"></i>
+            <span class="menu-item-label">Все чаты</span>
           </div>
         </div>
       </div>
-
-      <!-- Поиск коллег -->
-      <div class="search-container">
-        <input type="text" class="search-input" placeholder="Поиск" />
-        <i class="fas fa-search search-icon"></i>
-      </div>
-
-      <div class="chat-list">
-        <div class="chat-item">
-          <div class="chat-avatar"></div>
-          <div>
-            <h4>Андрей Телеграмов</h4>
-            <p>Привет! Как насчет встречи завтра?</p>
-          </div>
+    
+      <!-- Основной контент сайдбара -->
+      <div class="sidebar-content">
+        <div class="search-container">
+          <input type="text" class="search-input" placeholder="Поиск" />
+          <i class="fas fa-search search-icon"></i>
         </div>
+        <div class="chat-list"></div>
       </div>
     </div>
 
     <!-- Основное окно чата -->
     <div class="main-chat">
       <div class="message-container">
-        <div class="message">
-          Привет! Как дела?
-          <div class="message-time">12:34</div>
-        </div>
-        <div class="message outgoing">
-          Всё отлично, спасибо!
-          <div class="message-time">12:35 ✓✓</div>
-        </div>
+        <!-- Сообщения будут добавляться динамически -->
       </div>
       <div class="message-input-container">
         <div class="attach-button">
           <i class="fas fa-paperclip"></i>
         </div>
-        <input type="text" class="message-input" placeholder="Введите сообщение..." />
+        <input
+          type="text"
+          class="message-input"
+          placeholder="Введите сообщение..."
+        />
         <div class="send-button">
           <i class="fas fa-paper-plane"></i>
         </div>
       </div>
     </div>
 
-    <!-- Модальное окно профиля (открывается только по клику на "Мой профиль") -->
+    <!-- Модальное окно профиля -->
     <div class="profile-modal" id="profileModal">
       <div class="profile-modal-content">
         <div class="profile-modal-header">
@@ -123,34 +108,34 @@
         </div>
       </div>
     </div>
-    
+
     <script>
-      // UI-логика для управления меню и прочими эффектами (можно также вынести в отдельный файл)
+      // Открыть/закрыть меню настроек
       function toggleSettingsMenu() {
         document.getElementById("settingsMenu").classList.toggle("active");
       }
-      
-      function toggleUserMenu(event) {
-        event.stopPropagation();
-        const menu = document.querySelector(".dropdown-menu");
-        menu.classList.toggle("show");
-      }
-      
+
+      // Закрытие меню, если клик вне его
       document.addEventListener("click", function (e) {
-        if (!e.target.closest(".settings-menu") && !e.target.closest(".menu-toggle")) {
+        // Если клик не по меню и не по иконке меню
+        if (
+          !e.target.closest(".settings-menu") &&
+          !e.target.closest(".vertical-menu-item")
+        ) {
           document.getElementById("settingsMenu").classList.remove("active");
         }
-        if (!e.target.closest(".user-menu")) {
-          document.querySelector(".dropdown-menu").classList.remove("show");
-        }
       });
-      
-      document.querySelector(".message-input").addEventListener("focus", function () {
-        this.parentElement.style.background = "#e6e8eb";
-      });
-      document.querySelector(".message-input").addEventListener("blur", function () {
-        this.parentElement.style.background = "#f0f2f5";
-      });
+
+      // UI-эффекты для поля ввода сообщения
+      const messageInput = document.querySelector(".message-input");
+      if (messageInput) {
+        messageInput.addEventListener("focus", function () {
+          this.parentElement.style.background = "#e6e8eb";
+        });
+        messageInput.addEventListener("blur", function () {
+          this.parentElement.style.background = "#f0f2f5";
+        });
+      }
     </script>
   </body>
 </html>

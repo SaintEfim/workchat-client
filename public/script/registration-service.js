@@ -1,5 +1,5 @@
 // registration-service.js
-
+import { beforeAuthorize } from './authentication-service.js';
 const registrationServiceUrl = `http://localhost:1001/api/v1/registration/register`;
 
 const userRegistration = {
@@ -45,6 +45,7 @@ async function handleRegistration(event) {
     if (data.accessToken && data.refreshToken) {
       document.cookie = `accessToken=${data.accessToken}; path=/; max-age=${data.expiresIn}; SameSite=Strict`;
       document.cookie = `refreshToken=${data.refreshToken}; path=/; max-age=${data.expireIn}; SameSite=Strict`;
+      await beforeAuthorize();
       console.log('Tokens have been saved to cookies');
       window.location.href = 'chat';
     }

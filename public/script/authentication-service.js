@@ -11,7 +11,7 @@ const userAuthentication = {
 /**
  * Выполняет дополнительный запрос для получения ID пользователя и сохраняет его в cookie.
  */
-async function beforeAuthorize() {
+export async function beforeAuthorize() {
   const accessToken = getCookie('accessToken');
   console.log("Access token:", accessToken);
 

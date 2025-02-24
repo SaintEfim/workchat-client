@@ -3,7 +3,37 @@ import { fetchCurrentUser, getAccessToken } from './employees-service.js';
 const CHAT_API_URL = 'http://localhost:1006/api/v1/chats';
 
 /**
- * Получает чат между текущим пользователем и выбранным сотрудником.
+ * Проверяет, существует ли приватный чат между текущим пользователем и заданным сотрудником.
+ * Эндпоинт: GET /api/v1/chats/user/{user_id}/colleague/{colleague_id}
+ */
+async function privateChatExists(colleagueId) {
+  const currentUser = await fetchCurrentUser();
+  const accessToken = getAccessToken();
+  if (!accessToken) {
+    throw new Error("Access token не найден");
+  }
+
+  const checkUrl = `${CHAT_API_URL}/user/${currentUser.id}/colleague/${colleagueId}`;
+  const response = await fetch(checkUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Ошибка проверки чата: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.exists; // булево значение
+}
+
+/**
+ * Получает приватный чат между текущим пользователем и указанным сотрудником (colleagueId).
+ * Эндпоинт: GET /api/v1/chats/user/{user_id}?colleagueId=...&is_group=false
+ * Возвращает первый найденный чат или null.
  */
 async function getChatWithEmployee(colleagueId) {
   try {
@@ -14,6 +44,7 @@ async function getChatWithEmployee(colleagueId) {
       throw new Error("Access token не найден");
     }
 
+    // Запрашиваем чаты текущего пользователя с фильтрами colleagueId и is_group=false
     const url = `${CHAT_API_URL}/user/${currentUser.id}?colleagueId=${colleagueId}&is_group=false`;
     const response = await fetch(url, {
       headers: {
@@ -23,10 +54,11 @@ async function getChatWithEmployee(colleagueId) {
     });
 
     if (!response.ok) {
-      throw new Error(`Ошибка получения чатов: ${response.status}`);
+      throw new Error(`Ошибка получения чата: ${response.status}`);
     }
 
     const chats = await response.json();
+    // Если найдены чаты, возвращаем первый; иначе null
     return chats.length > 0 ? chats[0] : null;
   } catch (error) {
     console.error("Ошибка при получении чата", error);
@@ -35,7 +67,7 @@ async function getChatWithEmployee(colleagueId) {
 }
 
 /**
- * Создает новый приватный чат (без имени).
+ * Создаёт новый приватный чат (без имени), в котором участвуют текущий пользователь и сотрудник.
  */
 async function createChat(employee) {
   try {
@@ -46,11 +78,11 @@ async function createChat(employee) {
       throw new Error("Access token не найден");
     }
 
-    // Имя чата оставляем пустым, чтобы показывать его как "Private Chat"
+    // Имя чата оставляем пустым, чтобы потом отображать как "Private Chat"
     const chatData = {
       name: ``,
       is_group: false,
-      employee_ids: [currentUser.id, employee.id]
+      employee_ids: [currentUser.id, employee.id],
     };
 
     const response = await fetch(CHAT_API_URL, {
@@ -59,7 +91,7 @@ async function createChat(employee) {
         'Content-Type': 'application/json',
         // 'Authorization': `Bearer ${accessToken}`
       },
-      body: JSON.stringify(chatData)
+      body: JSON.stringify(chatData),
     });
 
     if (!response.ok) {
@@ -103,16 +135,19 @@ export async function loadChatMessages(chatId) {
     messages.forEach(message => {
       const messageEl = document.createElement('div');
 
+      // Если отправитель - текущий пользователь, сообщение исходящее
       if (message.employee_id === currentUser.id) {
         messageEl.classList.add('message', 'outgoing');
       } else {
         messageEl.classList.add('message');
       }
 
+      // Текст сообщения
       const textEl = document.createElement('span');
       textEl.textContent = message.text;
       messageEl.appendChild(textEl);
 
+      // Время сообщения
       const timeEl = document.createElement('div');
       timeEl.classList.add('message-time');
       const msgTime = new Date(message.created_at);
@@ -127,7 +162,7 @@ export async function loadChatMessages(chatId) {
 }
 
 /**
- * Удаляет чат.
+ * Удаляет чат по его ID.
  */
 async function deleteChat(chatId) {
   try {
@@ -153,21 +188,29 @@ async function deleteChat(chatId) {
 }
 
 /**
- * Открывает или создает приватный чат с выбранным сотрудником.
+ * Открывает (или создаёт) приватный чат с выбранным сотрудником,
+ * используя эндпоинт PrivateChatExists для проверки.
  */
 export async function openChatWithEmployee(employee) {
   try {
-    let chat = await getChatWithEmployee(employee.id);
-    
-    if (!chat) {
-      // Если чата нет — создаём
+    // 1. Проверяем, существует ли уже приватный чат
+    const exists = await privateChatExists(employee.id);
+
+    let chat;
+    if (exists) {
+      // 2. Если чат есть, получаем его
+      chat = await getChatWithEmployee(employee.id);
+    } else {
+      // 3. Если чата нет, создаём новый
       chat = await createChat(employee);
-      // И сразу обновляем список чатов, чтобы новый чат отобразился слева
+      // И сразу обновляем список чатов, чтобы он отобразился слева
       await loadUserChats();
     }
 
-    // Загрузка сообщений для выбранного (или нового) чата
-    loadChatMessages(chat.id);
+    // 4. Загружаем сообщения, если чат получен
+    if (chat) {
+      loadChatMessages(chat.id);
+    }
   } catch (error) {
     console.error("Ошибка при открытии чата", error);
   }
@@ -260,9 +303,9 @@ export async function loadUserChats() {
       const chatItem = document.createElement('div');
       chatItem.classList.add('chat-item');
 
+      // Если имя чата пустое (приватный чат) - формируем название по собеседнику
       let chatTitle = chat.name;
       if (!chatTitle || chatTitle.trim() === '') {
-        // Приватный чат — название формируем по собеседнику
         const colleague = chat.employees.find(emp => emp.id !== currentUser.id);
         chatTitle = colleague ? `${colleague.name} ${colleague.surname}` : "Private Chat";
       }
@@ -279,7 +322,7 @@ export async function loadUserChats() {
         showContextMenu(event, chat);
       });
 
-      // При клике левой кнопкой — открываем чат
+      // При клике левой кнопкой — открываем переписку
       chatItem.addEventListener('click', () => {
         loadChatMessages(chat.id);
       });
@@ -291,9 +334,8 @@ export async function loadUserChats() {
   }
 }
 
-// При загрузке страницы — отображаем все чаты
+// При загрузке страницы — отображаем все чаты и вешаем обработчик на "Все чаты"
 document.addEventListener('DOMContentLoaded', () => {
-  // Кнопка "Все чаты" в левой колонке
   const allChatsBtn = document.getElementById('allChatsBtn');
   if (allChatsBtn) {
     allChatsBtn.addEventListener('click', () => {
@@ -301,6 +343,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Первоначальная загрузка чатов
   loadUserChats();
 });

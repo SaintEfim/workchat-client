@@ -82,7 +82,7 @@ async function createChat(employee) {
     const chatData = {
       name: ``,
       is_group: false,
-      employee_ids: [currentUser.id, employee.id],
+      participant_ids: [currentUser.id, employee.id],
     };
 
     const response = await fetch(CHAT_API_URL, {
@@ -306,7 +306,7 @@ export async function loadUserChats() {
       // Если имя чата пустое (приватный чат) - формируем название по собеседнику
       let chatTitle = chat.name;
       if (!chatTitle || chatTitle.trim() === '') {
-        const colleague = chat.employees.find(emp => emp.id !== currentUser.id);
+        const colleague = chat.participants.find(emp => emp.id !== currentUser.id);
         chatTitle = colleague ? `${colleague.name} ${colleague.surname}` : "Private Chat";
       }
 

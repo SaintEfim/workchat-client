@@ -4,16 +4,16 @@ const CHAT_API_URL = 'http://localhost:1006/api/v1/chats';
 
 /**
  * Проверяет, существует ли приватный чат между текущим пользователем и заданным сотрудником.
- * Эндпоинт: GET /api/v1/chats/user/{user_id}/colleague/{colleague_id}
+ * Эндпоинт: GET /api/v1/chats/user/{user_id}/interlocutor/{interlocutorId}
  */
-async function privateChatExists(colleagueId) {
+async function privateChatExists(interlocutorId) {
   const currentUser = await fetchCurrentUser();
   const accessToken = getAccessToken();
   if (!accessToken) {
     throw new Error("Access token не найден");
   }
 
-  const checkUrl = `${CHAT_API_URL}/user/${currentUser.id}/colleague/${colleagueId}`;
+  const checkUrl = `${CHAT_API_URL}/user/${currentUser.id}/interlocutor/${interlocutorId}`;
   const response = await fetch(checkUrl, {
     method: 'GET',
     headers: {
@@ -32,10 +32,10 @@ async function privateChatExists(colleagueId) {
 
 /**
  * Получает приватный чат между текущим пользователем и указанным сотрудником (colleagueId).
- * Эндпоинт: GET /api/v1/chats/user/{user_id}?colleagueId=...&is_group=false
+ * Эндпоинт: GET /api/v1/chats/user/{user_id}?interlocutorId=...&is_group=false
  * Возвращает первый найденный чат или null.
  */
-async function getChatWithEmployee(colleagueId) {
+async function getChatWithEmployee(interlocutorId) {
   try {
     const currentUser = await fetchCurrentUser();
     const accessToken = getAccessToken();
@@ -45,7 +45,7 @@ async function getChatWithEmployee(colleagueId) {
     }
 
     // Запрашиваем чаты текущего пользователя с фильтрами colleagueId и is_group=false
-    const url = `${CHAT_API_URL}/user/${currentUser.id}?colleagueId=${colleagueId}&is_group=false`;
+    const url = `${CHAT_API_URL}/user/${currentUser.id}?interlocutorId=${interlocutorId}&is_group=false`;
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',

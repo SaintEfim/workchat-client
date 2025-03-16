@@ -50,7 +50,7 @@ export async function loadChatMessages(chatId) {
     const chatData = chatsData.get(chatId);
 
     messages.forEach(msg => {
-      const isOutgoing = msg.sender_id === currentUser.id;
+      const isOutgoing = msg.senderId === currentUser.id;
       messageContainer.innerHTML += `
         <div class="message ${isOutgoing ? 'outgoing' : ''}">
           ${!isOutgoing ? '<div class="message-avatar"></div>' : ''}
@@ -156,13 +156,15 @@ async function createChat(employee) {
     body: JSON.stringify({
       name: '',
       is_group: false,
-      participant_ids: [currentUser.id, employee.id],
+      participantIds: [currentUser.id, employee.id],
     }),
   });
   return response.json();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  loadUserChats();
+  
   const allChatsBtn = document.getElementById('allChatsBtn');
   const sendButton = document.querySelector('.send-button');
   const messageInput = document.querySelector('.message-input');

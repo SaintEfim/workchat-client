@@ -48,8 +48,28 @@ function handleSocketMessage(event) {
   try {
     console.log('Получено WS сообщение:', event.data);
     const data = JSON.parse(event.data);
+
+    // Обработка ответа при подключении: если есть поля content и error
+    if (data.content !== undefined && data.error !== undefined) {
+      if (data.error) {
+        console.error('Ошибка подключения WS:', data.error);
+      } else {
+        console.log('Подключение WS успешно:', data.content);
+      }
+      return;
+    }
     
-    if (data.text && data.create_at) {
+    // Если данные приходят с маленькой буквы, нормализуем их
+    if (data.text && data.createAt) {
+      const normalizedData = {
+        Text: data.text,
+        CreateAt: data.createAt,
+        SenderId: data.senderId,
+        ReceiverId: data.receiverId
+      };
+      console.log('Добавление сообщения в чат (нормализованные данные):', normalizedData);
+      handleNewMessage(normalizedData);
+    } else if (data.Text && data.CreateAt) {
       console.log('Добавление сообщения в чат:', data);
       handleNewMessage(data);
     } else {
@@ -83,9 +103,9 @@ export async function sendMessage(messageData) {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        chat_id: messageData.chatId,
-        sender_id: messageData.senderId,
-        receiver_id: messageData.receiverId,
+        chatId: messageData.chatId,
+        senderId: messageData.senderId,
+        receiverId: messageData.receiverId,
         text: messageData.text
       }),
     });
@@ -96,10 +116,11 @@ export async function sendMessage(messageData) {
     }
     
     console.log('Сообщение успешно отправлено, добавляем в UI:', messageData.text);
+    // Используем новые ключи для локального отображения
     addMessageToChat({
-      text: messageData.text,
-      create_at: new Date().toISOString(),
-      sender_id: messageData.senderId
+      Text: messageData.text,
+      CreateAt: new Date().toISOString(),
+      SenderId: messageData.senderId
     });
 
     return data;
@@ -109,6 +130,16 @@ export async function sendMessage(messageData) {
   }
 }
 
+// Функция для получения значения cookie по имени
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop().split(';').shift();
+  }
+  return null;
+}
+
 function addMessageToChat(message) {
   const messageContainer = document.querySelector('.message-container');
   if (!messageContainer) {
@@ -116,18 +147,26 @@ function addMessageToChat(message) {
     return;
   }
 
-  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-  const isOutgoing = message.sender_id === currentUser?.id;
-
+  // Получаем id текущего пользователя из cookie
+  const currentUserId = getCookie('userId');
+  
+  // Логирование для отладки
+  console.log('SenderId:', message.SenderId);
+  console.log('Current user id (cookie):', currentUserId);
+  
+  // Сравниваем id в нижнем регистре
+  const isOutgoing = message.SenderId?.toLowerCase() === currentUserId?.toLowerCase();
+  console.log('isOutgoing:', isOutgoing);
+  
   console.log('Добавление сообщения в DOM:', message);
   
   const messageHTML = `
     <div class="message ${isOutgoing ? 'outgoing' : ''}">
       ${!isOutgoing ? '<div class="message-avatar"></div>' : ''}
       <div class="message-content">
-        <span>${message.text}</span>
+        <span>${message.Text}</span>
         <div class="message-time">
-          ${new Date(message.create_at).toLocaleTimeString([], { 
+          ${new Date(message.CreateAt).toLocaleTimeString([], { 
             hour: '2-digit', 
             minute: '2-digit' 
           })}

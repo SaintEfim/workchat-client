@@ -1,6 +1,7 @@
 // emaildomains-service.js
 
-const emailDomainsServiceUrl = `http://localhost:1002/api/v1/email-domains?withIncludes=false`;
+const serverIp = window.location.hostname; // Автоматически берёт IP, с которого открыт сайт
+const emailDomainsServiceUrl = `http://${serverIp}:1002/api/v1/email-domains?withIncludes=false`;
 
 // Кэш для стандартного списка доменов (без фильтра)
 let cachedDomains = [];

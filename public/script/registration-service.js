@@ -1,6 +1,8 @@
 // registration-service.js
 import { beforeAuthorize } from './authentication-service.js';
-const registrationServiceUrl = `http://localhost:1001/api/v1/registration/register`;
+
+const serverIp = window.location.hostname;
+const registrationServiceUrl = `http://${serverIp}:1001/api/v1/registration/register`;
 
 const userRegistration = {
   name: '',

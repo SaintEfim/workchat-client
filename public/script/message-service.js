@@ -1,7 +1,8 @@
 import { fetchCurrentUser, getAccessToken } from './employees-service.js';
 
-const MESSAGE_SERVICE_WS_URL = 'ws://localhost:1007/api/v1/messages/connect';
-const MESSAGE_SERVICE_HTTP_URL = 'http://localhost:1007/api/v1/messages';
+const serverIp = window.location.hostname;
+const MESSAGE_SERVICE_WS_URL = `ws://${serverIp}:1007/api/v1/messages/connect`;
+const MESSAGE_SERVICE_HTTP_URL = `http://${serverIp}:1007/api/v1/messages`;
 
 export let messageSocket = null;
 let currentChat = null;

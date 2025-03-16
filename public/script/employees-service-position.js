@@ -1,6 +1,7 @@
 // employees-service-position.js
 
-const employeesServiceUrlGetPositions = `http://localhost:1003/api/v1/positions?withIncludes=false`;
+const serverIp = window.location.hostname;
+const employeesServiceUrlGetPositions = `http://${serverIp}:1003/api/v1/positions?withIncludes=false`;
 
 /**
  * Загружает список позиций с сервера и заполняет выпадающий список.

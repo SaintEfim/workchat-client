@@ -1,7 +1,8 @@
 // authentication-service.js
 
-const authenticationServiceUrlLogin = `http://localhost:1005/api/v1/authentication/login`;
-const authenticationServiceUrlGetId = `http://localhost:1005/api/v1/authentication/getId`;
+const serverIp = window.location.hostname; // Автоматически берёт IP, с которого открыт сайт
+const authenticationServiceUrlLogin = `http://${serverIp}:1005/api/v1/authentication/login`;
+const authenticationServiceUrlGetId = `http://${serverIp}:1005/api/v1/authentication/getId`;
 
 const userAuthentication = {
   email: "",

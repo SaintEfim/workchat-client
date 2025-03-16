@@ -16,7 +16,6 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 // создаём маршрут для главной страницы
-// http://localhost:4200/
 app.get('/', function(req, res) {
   res.sendFile('public/login-and-registration-index.html', { root: __dirname });
 });

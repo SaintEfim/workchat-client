@@ -1,7 +1,8 @@
 import { fetchCurrentUser, getAccessToken } from './employees-service.js';
 import { connectMessageService, sendMessage, setCurrentChat } from './message-service.js';
 
-const CHAT_API_URL = 'http://localhost:1006/api/v1/chats';
+const serverIp = window.location.hostname; // Автоматически берёт IP, с которого открыт сайт
+const CHAT_API_URL = `http://${serverIp}:1006/api/v1/chats`;
 let currentChat = null;
 const chatsData = new Map();
 

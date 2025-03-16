@@ -1,8 +1,8 @@
 // employees-service.js
 import { openChatWithEmployee } from './chat-service.js';
 
-
-const API_BASE_URL = 'http://localhost:1003/api/v1/employees';
+const serverIp = window.location.hostname;
+const API_BASE_URL = `http://${serverIp}:1003/api/v1/employees`;
 const EMPLOYEE_API_URL = `${API_BASE_URL}/`;
 
 function getCookie(name) {

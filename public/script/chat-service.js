@@ -114,26 +114,35 @@ export async function loadUserChats() {
   }
 }
 
+async function fetchUserChats() {
+  const currentUser = await fetchCurrentUser();
+  const response = await fetch(`${CHAT_API_URL}/user/${currentUser.id}`, {
+    headers: { Authorization: `Bearer ${getAccessToken()}` }
+  });
+  if (!response.ok) throw new Error('Ошибка загрузки чатов');
+  return await response.json();
+}
+
 export async function openChatWithEmployee(employee) {
   try {
     const currentUser = await fetchCurrentUser();
+    const userChats = await fetchUserChats();
     
-    const response = await fetch(
-      `${CHAT_API_URL}/user/${currentUser.id}/interlocutor/${employee.id}`,
-      { headers: { Authorization: `Bearer ${getAccessToken()}` } }
+    // Ищем существующий приватный чат с сотрудником
+    const existingChat = userChats.find(chat => 
+      !chat.is_group && 
+      chat.participants.some(p => p.id === employee.id)
     );
-    
-    const { exists } = await response.json();
+
     let chat;
 
-    if (exists) {
-      chat = await (await fetch(`${CHAT_API_URL}/user/${currentUser.id}?interlocutorId=${employee.id}`, {
-        headers: { Authorization: `Bearer ${getAccessToken()}` }
-      })).json();
+    if (existingChat) {
+      chat = existingChat;
+      chatsData.set(chat.id, { ...chat, interlocutor: employee });
     } else {
       chat = await createChat(employee);
       chatsData.set(chat.id, { ...chat, interlocutor: employee });
-      await loadUserChats();
+      await loadUserChats(); // Обновляем список чатов в UI
     }
 
     if (chat) {

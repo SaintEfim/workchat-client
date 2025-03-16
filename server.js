@@ -16,7 +16,7 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 // создаём маршрут для главной страницы
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   res.sendFile('public/login-and-registration-index.html', { root: __dirname });
 });
 
@@ -30,11 +30,11 @@ app.use('/chat', (req, res, next) => {
 });
 
 // создаём маршрут для чата
-app.get('/chat', function(req, res) {
+app.get('/chat', function (req, res) {
   res.sendFile('public/chat.html', { root: __dirname });
 });
 
 // запускаем сервер на порту, указанном в конфигурации 
-app.listen(4200, () => {
+app.listen(4200, '0.0.0.0', () => {
   console.log('Сервер стартовал на порту 4200!');
 });
